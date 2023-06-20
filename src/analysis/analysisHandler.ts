@@ -7,9 +7,14 @@ import { createOrganization } from "../services/organization/register";
 
 async function analysisHandler(
   context: TagoContext,
-  scope: Data[],
-  config_dev: Device
+  scope: Data[]
 ): Promise<void> {
+  console.log("SCOPE:", JSON.stringify(scope, null, 4));
+  console.log("CONTEXT:", JSON.stringify(context, null, 4));
+  console.log("Running Analysis");
+
+  const config_dev = await getConfigDevice();
+
   const environment = Utils.envToJson(context.environment);
 
   const router = new Utils.AnalysisRouter({
@@ -44,17 +49,4 @@ async function getConfigDevice(): Promise<Device> {
   return new Device({ token: config_dev_token.token });
 }
 
-async function startAnalysis(
-  context: TagoContext,
-  scope: Data[]
-): Promise<void> {
-  console.log("SCOPE:", JSON.stringify(scope, null, 4));
-  console.log("CONTEXT:", JSON.stringify(context, null, 4));
-  console.log("Running Analysis");
-
-  const config_dev = await getConfigDevice();
-
-  await analysisHandler(context, scope, config_dev);
-}
-
-Analysis.use(startAnalysis, { token: process.env.T_ANALYSIS_TOKEN });
+Analysis.use(analysisHandler, { token: process.env.T_ANALYSIS_TOKEN });
