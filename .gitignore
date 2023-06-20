@@ -1,3 +1,4 @@
 .tago-lock.dev.lock
 .tagoio
 node_modules
+.vscode
