@@ -1,0 +1,26 @@
+{
+    "analysisPath": "./src/analysis",
+    "buildPath": "./build",
+    "dev": {
+        "analysisList": [
+            {
+                "fileName": "analysisAssetTracker.ts",
+                "name": "Asset Tracking",
+                "id": "647743c587d3230008a1112f"
+            },
+            {
+                "fileName": "analysisDeviceUpdater.ts",
+                "name": "Device Updater",
+                "id": "647743badddc3900093dfa44"
+            },
+            {
+                "fileName": "analysisHandler.ts",
+                "name": "Handler",
+                "id": "64774162a90c38000860189a"
+            }
+        ],
+        "id": "6363be9028a9990018c8db1e",
+        "profileName": "Fleet Management Not in video",
+        "email": "freddy.minuzzi@tago.io"
+    }
+}
