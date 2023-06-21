@@ -1,5 +1,5 @@
 import { Resources } from "@tago-io/sdk";
-import { ConfigurationParams } from "@tago-io/sdk/out/modules/Resources/devices.types";
+import { ConfigurationParams } from "@tago-io/sdk/src/modules/Resources/devices.types";
 
 /**
  * Creates a resolver to add/update configuration params on the devices.

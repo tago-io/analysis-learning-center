@@ -2,7 +2,7 @@ import { Resources } from "@tago-io/sdk";
 import {
   DeviceListItem,
   DeviceQuery,
-} from "@tago-io/sdk/out/modules/Resources/devices.types";
+} from "@tago-io/sdk/src/modules/Resources/devices.types";
 
 type FetchDeviceResponse = Pick<
   DeviceListItem,

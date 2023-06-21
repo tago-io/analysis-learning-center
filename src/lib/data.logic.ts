@@ -1,4 +1,4 @@
-import { DataToSend } from "@tago-io/sdk/out/modules/Device/device.types";
+import { DataToSend } from "@tago-io/sdk/src/modules/Device/device.types";
 
 // ? ==================================== (c) TagoIO ====================================
 // ? What is this file?

@@ -1,5 +1,5 @@
 import { Resources } from "@tago-io/sdk";
-import { TagsObj } from "@tago-io/sdk/out/common/common.types";
+import { TagsObj } from "@tago-io/sdk/src/common/common.types";
 
 /**
  * Creates a resolver to add/update tags on the devices.

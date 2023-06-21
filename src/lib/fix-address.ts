@@ -1,4 +1,4 @@
-import { Data } from "@tago-io/sdk/out/common/common.types";
+import { Data } from "@tago-io/sdk/src/common/common.types";
 
 /**
  * Convert a data { location, value } to "lat,lng;label"

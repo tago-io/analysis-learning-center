@@ -1,6 +1,6 @@
 import { Device } from "@tago-io/sdk";
-import { Data } from "@tago-io/sdk/out/common/common.types";
-import { DataToEdit, DataToSend } from "@tago-io/sdk/out/modules/Device/device.types";
+import { Data } from "@tago-io/sdk/src/common/common.types";
+import { DataToEdit, DataToSend } from "@tago-io/sdk/src/modules/Device/device.types";
 
 /**
  * Creates a resolver to add/update data on the devices.

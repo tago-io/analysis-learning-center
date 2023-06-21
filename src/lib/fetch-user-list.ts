@@ -1,5 +1,5 @@
 import { Resources } from "@tago-io/sdk";
-import { UserInfo, UserQuery } from "@tago-io/sdk/out/modules/Resources/run.types";
+import { UserInfo, UserQuery } from "@tago-io/sdk/src/modules/Resources/run.types";
 
 type FetchUserResponse = Pick<UserInfo, "id" | "name" | "phone" | "company" | "tags" | "active" | "email" | "timezone">;
 

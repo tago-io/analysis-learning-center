@@ -1,5 +1,5 @@
 import { Resources, Services, Types } from "@tago-io/sdk";
-import { TagoContext } from "@tago-io/sdk/out/modules/Analysis/analysis.types";
+import { TagoContext } from "@tago-io/sdk/src/modules/Analysis/analysis.types";
 
 import { fetchUserList } from "./fetch-user-list";
 
@@ -18,7 +18,7 @@ interface UserData {
   name: string;
   phone?: string | number | boolean | void;
   timezone: string;
-  tags?: Types.Common.TagsObj[];
+  tags?: Types.TagsObj[];
   password?: string;
 }
 
