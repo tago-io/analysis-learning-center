@@ -1,19 +1,19 @@
-import { Data } from "@tago-io/sdk/src/common/common.types";
-
-import validation from "../../lib/validation";
+import { convertLocationParamToObj } from "../../lib/fix-address";
 import { ServiceParams } from "../../types";
 
-function getOrgVariables(scope: Data[]) {
-  const name = scope.find((x) => x.variable === "org_name")?.value as string;
-  const address = scope.find((x) => x.variable === "org_address") as Data;
-
+function getOrgVariables(scope: any) {
+  const name = scope[0]?.name;
+  const edit_address = scope[0]?.["param.address"];
+  const new_address = convertLocationParamToObj(edit_address);
+  const address = {
+    value: new_address?.value,
+    location: new_address?.location,
+  } as any;
   return { name, address };
 }
 
 async function editOrganization({ config_dev, scope }: ServiceParams) {
   const org_id = scope[0].device;
-  const validate = validation("org_validation", config_dev);
-  await validate("Editing...", "warning");
   const { name: org_name, address: org_address } = await getOrgVariables(scope);
 
   if (org_name) {
@@ -39,13 +39,11 @@ async function editOrganization({ config_dev, scope }: ServiceParams) {
 
     await config_dev.editData({
       ...org_id_data,
-      metadata: { ...org_id_data.metadata, label: org_address.value as string },
+      metadata: { ...org_id_data.metadata, label: org_address.value },
       location: org_address.location,
       value: org_address.value,
     });
   }
-
-  return await validate("Organization edited", "success");
 }
 
 export { editOrganization };

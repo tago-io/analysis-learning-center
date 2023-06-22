@@ -2,6 +2,7 @@ import { Analysis, Device, Resources, Utils } from "@tago-io/sdk";
 import { Data } from "@tago-io/sdk/src/common/common.types";
 import { TagoContext } from "@tago-io/sdk/src/modules/Analysis/analysis.types";
 
+import { deleteOrganization } from "../services/organization/delete";
 import { editOrganization } from "../services/organization/edit";
 import { createOrganization } from "../services/organization/register";
 
@@ -26,6 +27,7 @@ async function analysisHandler(
 
   router.register(createOrganization as any).whenInputFormID("create-org");
   router.register(editOrganization as any).whenCustomBtnID("edit-org");
+  router.register(deleteOrganization as any).whenDeviceListIdentifier("delete-org");
 
   const result = await router.exec();
 
