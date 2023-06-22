@@ -16,14 +16,13 @@ type FetchDeviceResponse = Pick<
  * @returns
  */
 async function fetchDeviceList(
-  account: Resources,
   filter: DeviceQuery["filter"]
 ): Promise<FetchDeviceResponse[]> {
   let device_list: FetchDeviceResponse[] = [];
 
   for (let index = 1; index < 9999; index++) {
     const amount = 100;
-    const foundDevices = await account.devices.list({
+    const foundDevices = await Resources.devices.list({
       page: index,
       fields: ["id", "name", "bucket", "tags", "last_input", "created_at"],
       filter,
