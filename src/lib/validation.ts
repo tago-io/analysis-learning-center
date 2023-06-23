@@ -1,5 +1,6 @@
-import { Device } from "@tago-io/sdk";
 import { DateTime } from "luxon";
+
+import { Device, Resources } from "@tago-io/sdk";
 
 type validation_type = "success" | "danger" | "warning" | string;
 interface IValidateOptions {
@@ -12,10 +13,28 @@ interface IValidateOptions {
  *
  * @returns a new function to be used to send the actual validation message.
  * @param validation_var variable of the validation in the widget
- * @param device device associated to the variable in the widget
+ * @param device_id device id associated to the variable in the widget
  * @param show_markdown enable/disable markdown
  */
-export default function validation(validation_var: string, device: Device, opts?: IValidateOptions) {
+export default async function validation(
+  validation_var: string,
+  device_id: string,
+  opts?: IValidateOptions
+) {
+  const [dev_info] = await Resources.devices.list({
+    filter: { id: device_id },
+  });
+
+  const [dev_token] = await Resources.devices.tokenList(dev_info.id, {
+    filter: { permission: "full" },
+  });
+
+  if (!dev_token.token) {
+    throw `Did not receive Device token of Device with id: ${device_id}, have you correctly created the Device?`;
+  }
+
+  const device = new Device({ token: dev_token.token });
+
   let i = 0;
   return async function _(message: string, type: validation_type) {
     if (!message || !type) {
@@ -41,7 +60,9 @@ export default function validation(validation_var: string, device: Device, opts?
           .toJSDate(), //increment time by i
         metadata: {
           type: ["success", "danger", "warning"].includes(type) ? type : null,
-          color: !["success", "danger", "warning"].includes(type) ? type : undefined,
+          color: !["success", "danger", "warning"].includes(type)
+            ? type
+            : undefined,
           show_markdown: !!opts?.show_markdown,
           user_id: opts?.user_id,
         },
