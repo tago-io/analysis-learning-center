@@ -17,8 +17,8 @@ async function installDevice({ new_org_name }) {
   const device_data = {
     name: new_org_name,
     type: "mutable",
-    connector: "5f5a8f3351d4db99c40dece5",
-    network: "5bbd0d144051a50034cd19fb",
+    connector: "5f5a8f3351d4db99c40dece5", // custom https
+    network: "5bbd0d144051a50034cd19fb", // custom https
   };
 
   const new_org = await Resources.devices.create(device_data as any);
@@ -34,7 +34,9 @@ async function installDevice({ new_org_name }) {
 }
 
 async function createOrganization({ scope, config_dev }: ServiceParams) {
-  const validate = validation("org_validation", config_dev);
+  const { id: config_dev_id } = await config_dev.info();
+
+  const validate = await validation("org_validation", config_dev_id);
   await validate("Registering...", "warning");
 
   const { name: new_org_name, address: new_org_address } =
@@ -65,14 +67,12 @@ async function createOrganization({ scope, config_dev }: ServiceParams) {
     filter: { label: "Organization Resources" },
   });
 
-  const { id: config_dev_id } = await config_dev.info();
-
   const org_data = {
     org_id: device_id,
     org_name: {
       value: new_org_name,
       metadata: {
-        url: `https://admin.tago.io/dashboards/info/${dashboard.id}?settings_device=${config_dev_id}&organization_device=${device_id}`,
+        url: `https://admin.tago.io/dashboards/info/${dashboard.id}?settings=${config_dev_id}&organization=${device_id}`,
       },
     },
     org_address: {
