@@ -88,7 +88,7 @@ async function createOrganization({ scope, config_dev }: ServiceParams) {
 
   await Resources.devices.paramSet(device_id, {
     key: "url_link",
-    value: `https://admin.tago.io/dashboards/info/${dashboard.id}?settings_device=${config_dev_id}&organization_device=${device_id}`,
+    value: `https://admin.tago.io/dashboards/info/${dashboard.id}?settings=${config_dev_id}&organization=${device_id}`,
   });
   await Resources.devices.paramSet(device_id, {
     key: "address",
