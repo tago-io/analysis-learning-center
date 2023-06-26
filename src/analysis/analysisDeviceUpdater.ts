@@ -2,7 +2,6 @@ import { queue } from "async";
 
 import { Analysis, Resources } from "@tago-io/sdk";
 
-import { fetchDeviceList } from "../lib/fetch-device-list";
 import { TagoContext } from "../types";
 
 async function resolveSensorQueue(data: any) {
@@ -30,17 +29,19 @@ async function resolveDevice(context: TagoContext, sensor_id: string) {
 async function deviceUpdater(context: TagoContext): Promise<void> {
   context.log("Running Analysis");
 
-  const sensorList = await fetchDeviceList({ tags: [{ key: "device_type", value: "sensor" }] });
+  const sensorList = await Resources.devices.listStreaming({ tags: [{ key: "device_type", value: "sensor" }] });
   const resolveQueue = queue(resolveSensorQueue, 5);
 
-  for (const device of sensorList) {
-    const site_id = device.tags.find((tag) => tag.key === "site_id")?.value;
-    if (!site_id) {
-      throw "Sensor not assigned to a Site";
+  for await (const deviceList of sensorList) {
+    for (const device of deviceList) {
+      const site_id = device.tags.find((tag) => tag.key === "site_id")?.value;
+      if (!site_id) {
+        throw "Sensor not assigned to a Site";
+      }
+      const sensor_id = device.id;
+      const data = { context, sensor_id };
+      void resolveQueue.push(data);
     }
-    const sensor_id = device.id;
-    const data = { context, sensor_id };
-    void resolveQueue.push(data);
   }
 
   await resolveQueue.drain();
