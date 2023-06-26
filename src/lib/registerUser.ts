@@ -1,8 +1,6 @@
 import { Resources, Services, Types } from "@tago-io/sdk";
 import { TagoContext } from "@tago-io/sdk/src/modules/Analysis/analysis.types";
 
-import { fetchUserList } from "./fetch-user-list";
-
 /** Account Summary
  * @param  {Object} context analysis context
  * @param  {Object} user user object with their data
@@ -23,7 +21,12 @@ interface UserData {
 
 async function updateUserAndReturnID(user_data: UserData) {
   // If got an error, try to find the user_data.
-  const [user] = await fetchUserList({ email: user_data.email });
+  const [user] = await Resources.run.listUsers({
+    fields: ["id", "name", "phone", "company", "tags", "active", "email", "timezone"],
+    filter: { email: user_data.email },
+    amount: 40,
+  });
+
   if (!user) {
     throw "Couldn`t find user data";
   }
@@ -31,7 +34,7 @@ async function updateUserAndReturnID(user_data: UserData) {
   user.tags = user.tags?.filter((x) => user_data.tags?.find((y) => x.key !== y.key));
   user.tags = user.tags?.concat(user_data.tags || []);
 
-  await Resources.run.userEdit(user.id, { tags: user_data.tags });
+  await Resources.run.userEdit(user.id as string, { tags: user_data.tags });
 
   return user.id;
 }

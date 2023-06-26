@@ -2,7 +2,6 @@ import { queue } from "async";
 
 import { Resources } from "@tago-io/sdk";
 
-import { fetchDeviceList } from "../../lib/fetch-device-list";
 import { ServiceParams } from "../../types";
 
 async function deleteSite({ config_dev, scope }: ServiceParams) {
@@ -37,7 +36,7 @@ async function deleteSite({ config_dev, scope }: ServiceParams) {
     }
   }
 
-  const devices = await fetchDeviceList({
+  const device_list = await Resources.devices.listStreaming({
     tags: [{ key: "site_id", value: site_id }],
   });
 
@@ -50,9 +49,11 @@ async function deleteSite({ config_dev, scope }: ServiceParams) {
   const deleteQueue = queue(deleteData, 5);
   deleteQueue.error((error: any) => console.log(error));
 
-  if (devices) {
-    for (const device of devices) {
-      void deleteQueue.push(device);
+  if (device_list) {
+    for await (const devices of device_list) {
+      for (const device of devices) {
+        void deleteQueue.push(device);
+      }
     }
   }
 

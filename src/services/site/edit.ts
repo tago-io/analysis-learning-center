@@ -3,7 +3,6 @@ import { queue } from "async";
 import { Resources } from "@tago-io/sdk";
 
 import { DataResolver } from "../../lib/edit.data";
-import { fetchDeviceList } from "../../lib/fetch-device-list";
 import { convertLocationParamToObj } from "../../lib/fix-address";
 import { ServiceParams } from "../../types";
 
@@ -56,7 +55,7 @@ async function editSite({ config_dev, scope }: ServiceParams) {
     await Resources.devices.edit(site_id, { name: site_name });
 
     // editing device site info
-    const device_list = await fetchDeviceList({
+    const device_list = await Resources.devices.listStreaming({
       tags: [
         { key: "site_id", value: site_id },
         { key: "device_type", value: "device" },
@@ -69,8 +68,10 @@ async function editSite({ config_dev, scope }: ServiceParams) {
     editQueue.error((error: any) => console.log(error));
 
     if (device_list) {
-      for (const device of device_list) {
-        void editQueue.push(device);
+      for await (const devices of device_list) {
+        for (const device of devices) {
+          void editQueue.push(device);
+        }
       }
     }
 

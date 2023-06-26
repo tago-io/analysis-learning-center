@@ -1,4 +1,4 @@
-import { Account, Analysis, Device, Resources, Utils } from "@tago-io/sdk";
+import { Analysis, Device, Resources, Utils } from "@tago-io/sdk";
 import { Data } from "@tago-io/sdk/src/common/common.types";
 import { TagoContext } from "@tago-io/sdk/src/modules/Analysis/analysis.types";
 
@@ -37,7 +37,7 @@ async function analysisHandler(context: TagoContext, scope: Data[]): Promise<voi
   router.register(deleteSite as any).whenDeviceListIdentifier("delete-site");
 
   router.register(createUser as any).whenInputFormID("create-user"); // dont forget to reactivate emails.
-  router.register(editUser as any).whenCustomBtnID("edit-user"); // problems duplicating information.
+  router.register(editUser as any).whenCustomBtnID("edit-user");
   router.register(deleteUser as any).whenUserListIdentifier("delete-user");
 
   const result = await router.exec();
