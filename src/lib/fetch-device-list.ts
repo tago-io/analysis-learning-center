@@ -11,7 +11,6 @@ type FetchDeviceResponse = Pick<
 /**
  * Fetchs the device list using filters.
  * Automatically apply pagination to not run on throughtput errors.
- * @param account TagoIO Account object
  * @param filter filter conditions of the request
  * @returns
  */

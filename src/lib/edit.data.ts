@@ -1,4 +1,4 @@
-import { Device } from "@tago-io/sdk";
+import { Device, Resources } from "@tago-io/sdk";
 import { Data } from "@tago-io/sdk/src/common/common.types";
 import { DataToEdit, DataToSend } from "@tago-io/sdk/src/modules/Device/device.types";
 
@@ -10,14 +10,28 @@ import { DataToEdit, DataToSend } from "@tago-io/sdk/src/modules/Device/device.t
  * editData.setVariable({ variable: "data-to-update", value: 1, group: "12312" });
  * await editData.apply();
  *
- * @param {Device} device your device instanced class
+ * @param {Device} device_id your device id
  * @param debug
  * @returns
  */
-function DataResolver(device: Device, debug: boolean = false) {
+async function DataResolver(device_id: string, debug: boolean = false) {
   const variables: string[] = [];
   const newDataList: DataToSend[] = [];
   let oldDataList: Data[] = [];
+
+  const [dev_info] = await Resources.devices.list({
+    filter: { id: device_id },
+  });
+
+  const [dev_token] = await Resources.devices.tokenList(dev_info.id, {
+    filter: { permission: "full" },
+  });
+
+  if (!dev_token.token) {
+    throw `Did not receive Device token of Device with id: ${device_id}, have you correctly created the Device?`;
+  }
+
+  const device = new Device({ token: dev_token.token });
 
   if (!(device instanceof Device)) {
     throw "[DataResolver] Device is not an instance of TagoIO Device";
@@ -62,7 +76,10 @@ function DataResolver(device: Device, debug: boolean = false) {
         if (oldData) {
           toUpdate.push({ ...item, id: oldData.id });
         } else {
-          toAdd.push({ ...item, group: !Array.isArray(groups) ? groups : item.group });
+          toAdd.push({
+            ...item,
+            group: !Array.isArray(groups) ? groups : item.group,
+          });
         }
       }
 

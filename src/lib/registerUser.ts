@@ -5,7 +5,6 @@ import { fetchUserList } from "./fetch-user-list";
 
 /** Account Summary
  * @param  {Object} context analysis context
- * @param  {TagoAccount} account account object from TagoIO
  * @param  {Object} user user object with their data
  * Example: { name: 'John Doe', phone: '+1444562367', email: 'johndoe@tago.io', timezone: 'America/Chicago' }
  * @param  {Array} tags tags to be added/update in to the user
@@ -22,23 +21,22 @@ interface UserData {
   password?: string;
 }
 
-async function updateUserAndReturnID(account: Resources, user_data: UserData) {
+async function updateUserAndReturnID(user_data: UserData) {
   // If got an error, try to find the user_data.
-  const [user] = await fetchUserList(account, { email: user_data.email });
+  const [user] = await fetchUserList({ email: user_data.email });
   if (!user) {
     throw "Couldn`t find user data";
   }
 
-  // If found, update the tags.
   user.tags = user.tags?.filter((x) => user_data.tags?.find((y) => x.key !== y.key));
   user.tags = user.tags?.concat(user_data.tags || []);
 
-  await account.run.userEdit(user.id, { tags: user_data.tags });
+  await Resources.run.userEdit(user.id, { tags: user_data.tags });
 
   return user.id;
 }
 
-async function inviteUser(context: TagoContext, account: Resources, user_data: UserData, domain_url: string) {
+async function inviteUser(context: TagoContext, user_data: UserData, domain_url: string) {
   user_data.email = user_data.email.toLowerCase();
 
   // Generate a Random Password
@@ -46,7 +44,7 @@ async function inviteUser(context: TagoContext, account: Resources, user_data: U
 
   let createError = "";
   // Try to create the user.
-  const result = await account.run
+  const result = await Resources.run
     .userCreate({
       active: true,
       company: "",
@@ -55,7 +53,7 @@ async function inviteUser(context: TagoContext, account: Resources, user_data: U
       name: user_data.name,
       phone: String(user_data.phone || ""),
       tags: user_data.tags,
-      timezone: user_data.timezone || "America/Sao_Paulo",
+      timezone: user_data.timezone,
       password,
     })
     .catch((error) => {
@@ -64,27 +62,27 @@ async function inviteUser(context: TagoContext, account: Resources, user_data: U
     });
 
   if (!result) {
-    return updateUserAndReturnID(account, user_data).catch(() => {
+    return updateUserAndReturnID(user_data).catch(() => {
       throw createError;
     });
   }
 
   // If success, send an email with the password
-  const emailService = new Services({ token: context.token }).email;
+  // const emailService = new Services({ token: context.token }).email;
 
-  void emailService.send({
-    to: user_data.email,
-    template: {
-      name: "user_registration",
-      params: {
-        name: user_data.name,
-        email: user_data.email,
-        password: password,
-        url_platform: domain_url,
-      },
-    },
-  });
-  return result.user;
+  // void emailService.send({
+  //   to: user_data.email,
+  //   template: {
+  //     name: "user_registration",
+  //     params: {
+  //       name: user_data.name,
+  //       email: user_data.email,
+  //       password: password,
+  //       url_platform: domain_url,
+  //     },
+  //   },
+  // });
+  // return result.user;
 }
 
 export { inviteUser };
