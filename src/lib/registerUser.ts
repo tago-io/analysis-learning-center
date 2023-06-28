@@ -71,21 +71,21 @@ async function inviteUser(context: TagoContext, user_data: UserData, domain_url:
   }
 
   // If success, send an email with the password
-  // const emailService = new Services({ token: context.token }).email;
+  const emailService = new Services({ token: context.token }).email;
 
-  // void emailService.send({
-  //   to: user_data.email,
-  //   template: {
-  //     name: "user_registration",
-  //     params: {
-  //       name: user_data.name,
-  //       email: user_data.email,
-  //       password: password,
-  //       url_platform: domain_url,
-  //     },
-  //   },
-  // });
-  // return result.user;
+  void emailService.send({
+    to: user_data.email,
+    template: {
+      name: "user_registration",
+      params: {
+        name: user_data.name,
+        email: user_data.email,
+        password: password,
+        url_platform: domain_url,
+      },
+    },
+  });
+  return result.user;
 }
 
 export { inviteUser };
