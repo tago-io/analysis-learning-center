@@ -5,6 +5,24 @@ import { DeviceInfo } from "@tago-io/sdk/src/modules/Resources/devices.types";
 import { parseTagoObject } from "../lib/data.logic";
 import { TagoContext } from "../types";
 
+function getSensorInfoOutside(vehicle: DeviceInfo, outdoor_data: Data, vehicle_img?: string) {
+  return parseTagoObject(
+    {
+      vehicle_outside_location: {
+        value: vehicle.name,
+        location: {
+          lat: outdoor_data?.location?.coordinates[1],
+          lng: outdoor_data?.location?.coordinates[0],
+        },
+        metadata: {
+          img_pin: vehicle_img,
+        },
+      },
+    },
+    vehicle.id
+  );
+}
+
 async function assetTracker(context: TagoContext, scope: Data[]) {
   context.log("Running Analysis");
 
@@ -33,28 +51,28 @@ async function assetTracker(context: TagoContext, scope: Data[]) {
 
   const sensorInfo = getSensorInfoOutside(vehicle_info, outdoor_data, vehicle_img);
 
-  await Resources.devices.deleteDeviceData(site_id, { variables: ["vehicle_outside_location", "vehicle_location"], groups: vehicle_id });
+  await Resources.devices.deleteDeviceData(site_id, { variables: ["vehicle_outside_location", "sensor_location"], groups: vehicle_id });
   await Resources.devices.sendDeviceData(site_id, sensorInfo);
 
-  context.log("Analysis Finished");
-}
-
-function getSensorInfoOutside(vehicle: DeviceInfo, outdoor_data: Data, vehicle_img?: string) {
-  return parseTagoObject(
+  // history tracker
+  const sensor_history = parseTagoObject(
     {
-      vehicle_outside_location: {
-        value: vehicle.name,
+      sensor_history: {
+        value: `${vehicle_info.name} Location history`,
         location: {
           lat: outdoor_data?.location?.coordinates[1],
           lng: outdoor_data?.location?.coordinates[0],
         },
         metadata: {
-          img_pin: vehicle_img,
+          vehiclename: vehicle_info,
         },
       },
     },
-    vehicle.id
+    vehicle_info.id
   );
+
+  await Resources.devices.sendDeviceData(site_id, sensor_history);
+  context.log("Analysis Finished");
 }
 
 Analysis.use(assetTracker, { token: process.env.T_ANALYSIS_TOKEN });

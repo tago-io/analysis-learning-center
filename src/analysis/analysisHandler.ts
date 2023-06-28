@@ -3,14 +3,15 @@ import { Data } from "@tago-io/sdk/src/common/common.types";
 import { TagoContext } from "@tago-io/sdk/src/modules/Analysis/analysis.types";
 
 import { deleteOrganization } from "../services/organization/delete";
-import { editOrganization } from "../services/organization/edit";
 import { createOrganization } from "../services/organization/register";
-import { editSite } from "../services/site/edit";
+import { createSensor } from "../services/sensor/register";
+import { deleteSensor } from "../services/sensor/remove";
 import { createSite } from "../services/site/register";
 import { deleteSite } from "../services/site/remove";
-import { editUser } from "../services/user/edit";
 import { createUser } from "../services/user/register";
 import { deleteUser } from "../services/user/remove";
+import { createVehicle } from "../services/vehicle/register";
+import { deleteVehicle } from "../services/vehicle/remove";
 
 async function analysisHandler(context: TagoContext, scope: Data[]): Promise<void> {
   console.log("SCOPE:", JSON.stringify(scope, null, 4));
@@ -29,16 +30,19 @@ async function analysisHandler(context: TagoContext, scope: Data[]): Promise<voi
   });
 
   router.register(createOrganization as any).whenInputFormID("create-org");
-  router.register(editOrganization as any).whenCustomBtnID("edit-org");
   router.register(deleteOrganization as any).whenDeviceListIdentifier("delete-org");
 
   router.register(createSite as any).whenInputFormID("create-site");
-  router.register(editSite as any).whenCustomBtnID("edit-site"); // not done
   router.register(deleteSite as any).whenDeviceListIdentifier("delete-site");
 
-  router.register(createUser as any).whenInputFormID("create-user"); // dont forget to reactivate emails.
-  router.register(editUser as any).whenCustomBtnID("edit-user");
+  router.register(createUser as any).whenInputFormID("create-user"); // Don't forget to reactive email
   router.register(deleteUser as any).whenUserListIdentifier("delete-user");
+
+  router.register(createSensor as any).whenInputFormID("create-sensor");
+  router.register(deleteSensor as any).whenDeviceListIdentifier("delete-sensor");
+
+  router.register(createVehicle as any).whenInputFormID("create-vehicle");
+  router.register(deleteVehicle as any).whenDeviceListIdentifier("delete-vehicle");
 
   const result = await router.exec();
 

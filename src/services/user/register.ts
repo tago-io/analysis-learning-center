@@ -1,7 +1,6 @@
-import { Resources, Types, Utils } from "@tago-io/sdk";
+import { Resources } from "@tago-io/sdk";
 import { Data } from "@tago-io/sdk/src/common/common.types";
 
-import { parseTagoObject } from "../../lib/data.logic";
 import { inviteUser } from "../../lib/registerUser";
 import validation from "../../lib/validation";
 import { ServiceParams } from "../../types";
@@ -16,9 +15,8 @@ async function getNewUserVariables(scope: Data[]) {
   return { new_user_name, new_user_email, new_user_phone, new_user_access, new_user_site } as any;
 }
 
-async function createUser({ context, scope, config_dev }: ServiceParams) {
+async function createUser({ context, scope }: ServiceParams) {
   const org_id = scope[0].device;
-  const { id: config_dev_id } = await config_dev.info();
   const validate = await validation("user_validation", org_id);
   await validate("Registering...", "warning");
   const { new_user_name, new_user_email, new_user_site, new_user_access, new_user_phone } = await getNewUserVariables(scope);
@@ -62,29 +60,8 @@ async function createUser({ context, scope, config_dev }: ServiceParams) {
     ],
   };
 
-  // registering user
-  const userNumber = await inviteUser(context, new_user_data, "rtls.tago.run/");
+  await inviteUser(context, new_user_data, "rtls.tago.run/");
 
-  const user_data = {
-    user_name: {
-      value: new_user_name.value,
-    },
-    user_email: {
-      value: new_user_email.value,
-    },
-    user_phone: {
-      value: new_user_phone.value,
-    },
-    user_site: {
-      value: new_user_site === undefined ? "" : new_user_site?.metadata.name,
-    },
-    user_access: {
-      value: new_user_access.value,
-    },
-  };
-
-  await Resources.devices.sendDeviceData(org_id, parseTagoObject(user_data, userNumber));
-  await Resources.devices.sendDeviceData(config_dev_id, parseTagoObject(user_data, userNumber));
   return await validate("User successfully invited! An email will be sent with the credentials to the new user.", "success");
 }
 

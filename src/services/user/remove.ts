@@ -2,8 +2,7 @@ import { Resources } from "@tago-io/sdk";
 
 import { ServiceParams } from "../../types";
 
-async function deleteUser({ config_dev, scope, environment }: ServiceParams) {
-  const { id: config_dev_id } = await config_dev.info();
+async function deleteUser({ scope, environment }: ServiceParams) {
   // @ts-ignore
   const user_id = scope[0].user;
   // checking if user exists
@@ -23,10 +22,7 @@ async function deleteUser({ config_dev, scope, environment }: ServiceParams) {
     throw "User tried to delete himself";
   }
 
-  await Resources.devices.deleteDeviceData(config_dev_id, { groups: user_id, qty: 9999 });
-  await Resources.devices.deleteDeviceData(org_id, { groups: user_id, qty: 9999 });
   await Resources.run.userDelete(user_id);
-
   return;
 }
 
