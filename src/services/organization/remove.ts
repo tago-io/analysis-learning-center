@@ -4,7 +4,7 @@ import { Resources } from "@tago-io/sdk";
 
 import { ServiceParams } from "../../types";
 
-async function deleteOrganization({ scope }: ServiceParams) {
+async function deleteOrganization({ scope, context }: ServiceParams) {
   const org_id = scope[0].device;
 
   const user_accounts = await Resources.run.listUsers({
@@ -13,17 +13,20 @@ async function deleteOrganization({ scope }: ServiceParams) {
 
   if (user_accounts) {
     for (const user of user_accounts) {
-      // void Resources.run.userDelete(user.id as string);
+      void Resources.run.userDelete(user.id as string);
       console.log("Deleting user:", user.name);
     }
   }
 
   const device_list = Resources.devices.listStreaming({
-    tags: [{ key: "organization_id", value: org_id }],
+    //@ts-ignore
+    filter: {
+      tags: [{ key: "organization_id", value: org_id }],
+    },
   });
 
   async function deleteDevice(device: any) {
-    // await Resources.devices.delete(device.id);
+    await Resources.devices.delete(device.id);
     console.log("Deleting device:", device.name);
   }
 
@@ -38,6 +41,7 @@ async function deleteOrganization({ scope }: ServiceParams) {
   }
 
   await deleteQueue.drain();
+  context.log("Analysis Finished");
   return;
 }
 

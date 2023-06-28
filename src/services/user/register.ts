@@ -61,7 +61,7 @@ async function createUser({ context, scope }: ServiceParams) {
   };
 
   await inviteUser(context, new_user_data, "rtls.tago.run/");
-
+  context.log("Analysis Finished");
   return await validate("User successfully invited! An email will be sent with the credentials to the new user.", "success");
 }
 

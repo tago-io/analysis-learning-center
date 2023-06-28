@@ -14,7 +14,7 @@ async function getNewVehicleVariables(scope: Data[]) {
   return {
     vehicleName: new_vehicle_name?.value as string,
     serieNumber: new_vehicle_serie?.value,
-    image: `https://api.tago.io/file/${new_vehicle_img?.id}/${new_vehicle_img?.value}`,
+    image: new_vehicle_img?.metadata?.file?.url,
     sensor_id: new_vehicle_sensor?.value as string,
   };
 }
@@ -43,7 +43,7 @@ async function installDevice({ new_dev_name, org_id, site_id, sensor_id, vehicle
   return new_dev.device_id;
 }
 
-async function createVehicle({ scope }: ServiceParams) {
+async function createVehicle({ scope, context }: ServiceParams) {
   const org_id = scope[0].device;
   const validate = await validation("vehicle_validation", org_id);
   await validate("Registering...", "warning");
@@ -70,18 +70,14 @@ async function createVehicle({ scope }: ServiceParams) {
 
   // updating sensor device with vehicle_id
   const { tags: sensor_tags } = await Resources.devices.info(sensor_id);
-  console.log("sensor tags:", sensor_tags as any);
   //@ts-ignore
   sensor_tags.find((x) => x.key === "vehicle_id").value = vehicle_id;
   //@ts-ignore
   sensor_tags.find((x) => x.key === "has_vehicle").value = "true";
 
-  console.log("sensor tags:", sensor_tags as any);
   await Resources.devices.edit(sensor_id, { tags: sensor_tags });
-
-  console.log("image url:", image);
-  await Resources.devices.paramSet(sensor_id, { key: "img_urlink", value: image });
-
+  await Resources.devices.paramSet(vehicle_id, { key: "image_urllink", value: image });
+  context.log("Analysis Finished");
   return validate("Vehicle created successfully!", "success");
 }
 

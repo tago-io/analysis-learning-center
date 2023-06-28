@@ -33,7 +33,7 @@ async function installDevice({ site_name, org_id }) {
   return new_site.device_id;
 }
 
-async function createSite({ scope }: ServiceParams) {
+async function createSite({ scope, context }: ServiceParams) {
   const org_id = scope[0].device;
   const validate = await validation("site_validation", org_id);
   await validate("Registering...", "warning");
@@ -69,6 +69,7 @@ async function createSite({ scope }: ServiceParams) {
     },
   ]);
 
+  context.log("Analysis Finished");
   return await validate("Site successfully created!", "success");
 }
 

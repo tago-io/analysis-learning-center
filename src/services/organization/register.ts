@@ -32,7 +32,7 @@ async function installDevice({ new_org_name }) {
   return new_org.device_id;
 }
 
-async function createOrganization({ scope, config_dev }: ServiceParams) {
+async function createOrganization({ scope, config_dev, context }: ServiceParams) {
   const { id: config_dev_id } = await config_dev.info();
 
   const validate = await validation("org_validation", config_dev_id);
@@ -69,6 +69,7 @@ async function createOrganization({ scope, config_dev }: ServiceParams) {
     },
   ]);
 
+  context.log("Analysis Finished");
   return await validate("Organization created", "success");
 }
 

@@ -29,7 +29,12 @@ async function resolveDevice(context: TagoContext, sensor_id: string) {
 async function deviceUpdater(context: TagoContext): Promise<void> {
   context.log("Running Analysis");
 
-  const sensorList = await Resources.devices.listStreaming({ tags: [{ key: "device_type", value: "sensor" }] });
+  const sensorList = await Resources.devices.listStreaming({
+    //@ts-ignore
+    filter: {
+      tags: [{ key: "device_type", value: "sensor" }],
+    },
+  });
   const resolveQueue = queue(resolveSensorQueue, 5);
 
   for await (const deviceList of sensorList) {
@@ -45,6 +50,7 @@ async function deviceUpdater(context: TagoContext): Promise<void> {
   }
 
   await resolveQueue.drain();
+  context.log("Analysis Finished");
 }
 
 Analysis.use(deviceUpdater, { token: process.env.T_ANALYSIS_TOKEN });

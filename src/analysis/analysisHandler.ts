@@ -2,8 +2,8 @@ import { Analysis, Device, Resources, Utils } from "@tago-io/sdk";
 import { Data } from "@tago-io/sdk/src/common/common.types";
 import { TagoContext } from "@tago-io/sdk/src/modules/Analysis/analysis.types";
 
-import { deleteOrganization } from "../services/organization/delete";
 import { createOrganization } from "../services/organization/register";
+import { deleteOrganization } from "../services/organization/remove";
 import { createSensor } from "../services/sensor/register";
 import { deleteSensor } from "../services/sensor/remove";
 import { createSite } from "../services/site/register";

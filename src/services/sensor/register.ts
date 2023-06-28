@@ -43,7 +43,7 @@ async function installDevice({ new_sensor_name, org_id, site_id, connector, new_
   return new_dev.device_id;
 }
 
-async function createSensor({ scope }: ServiceParams) {
+async function createSensor({ scope, context }: ServiceParams) {
   const org_id = scope[0].device;
 
   const validate = await validation("sensor_validation", org_id);
@@ -78,6 +78,7 @@ async function createSensor({ scope }: ServiceParams) {
     },
   ]);
 
+  context.log("Analysis Finished");
   return await validate("Device created successfully!", "success");
 }
 
