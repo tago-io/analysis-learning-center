@@ -1,11 +1,15 @@
 import { queue } from "async";
 
 import { Resources } from "@tago-io/sdk";
+import { DeviceListItem } from "@tago-io/sdk/lib/types";
 
 import { ServiceParams } from "../../types";
 
 async function deleteOrganization({ scope, context }: ServiceParams) {
   const org_id = scope[0].device;
+  if (!org_id) {
+    return;
+  }
 
   const user_accounts = await Resources.run.listUsers({
     filter: { tags: [{ key: "organization_id", value: org_id }] },
@@ -25,13 +29,11 @@ async function deleteOrganization({ scope, context }: ServiceParams) {
     },
   });
 
-  async function deleteDevice(device: any) {
-    await Resources.devices.delete(device.id);
-    console.log("Deleting device:", device.name);
-  }
-
+  const deleteDevice = async (device: DeviceListItem) => await Resources.devices.delete(device.id);
   const deleteQueue = queue(deleteDevice, 5);
+
   deleteQueue.error((error: any) => console.log(error));
+
   if (device_list) {
     for await (const devices of device_list) {
       for (const device of devices) {
@@ -40,9 +42,9 @@ async function deleteOrganization({ scope, context }: ServiceParams) {
     }
   }
 
-  await deleteQueue.drain();
-  context.log("Analysis Finished");
-  return;
+  if (deleteQueue.started) {
+    await deleteQueue.drain();
+  }
 }
 
 export { deleteOrganization };

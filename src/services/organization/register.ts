@@ -43,7 +43,7 @@ async function createOrganization({ scope, config_dev, context }: ServiceParams)
   const [org_exists] = await Resources.devices.list({ filter: { name: new_org_name } });
 
   if (org_exists) {
-    throw await validate("Organization name already exists", "danger");
+    return Promise.reject(await validate("Organization name already exists", "danger"));
   }
 
   if ((new_org_name as string)?.length < 3) {

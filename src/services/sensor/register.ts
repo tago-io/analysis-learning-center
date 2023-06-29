@@ -78,7 +78,6 @@ async function createSensor({ scope, context }: ServiceParams) {
     },
   ]);
 
-  context.log("Analysis Finished");
   return await validate("Device created successfully!", "success");
 }
 

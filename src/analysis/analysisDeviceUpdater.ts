@@ -4,26 +4,20 @@ import { Analysis, Resources } from "@tago-io/sdk";
 
 import { TagoContext } from "../types";
 
-async function resolveSensorQueue(data: any) {
-  const { context, sensor_id } = data;
-  void resolveDevice(context, sensor_id);
-}
-
-async function resolveDevice(context: TagoContext, sensor_id: string) {
-  const device_data = await Resources.devices.getDeviceData(sensor_id);
-  const battery = device_data.find((x) => x.variable === "battery_status_life")?.value as string;
+async function resolveDevice({ context, sensor_id } : { context: TagoContext, sensor_id: string }) {
+  const [battery] = await Resources.devices.getDeviceData(sensor_id, { variables: "battery_status_life", qty: 1 });
   if (!battery) {
     return context.log("No data");
   }
 
-  const old_params = await Resources.devices.paramList(sensor_id);
-  const old_battery_param = old_params.find((x) => x.key === "battery_level")?.id;
-  if (old_battery_param) {
-    await Resources.devices.paramSet(sensor_id, { value: String(battery), sent: false }, old_battery_param);
-  } else {
-    await Resources.devices.paramSet(sensor_id, { key: "battery_level", value: String(battery), sent: false });
-  }
-  return context.log("device updated Finished");
+  const paramList = await Resources.devices.paramList(sensor_id);
+  const batteryParamID = paramList.find((x) => x.key === "battery_level")?.id;
+  await Resources.devices.paramSet(sensor_id, 
+    { id: batteryParamID, 
+      key: "battery_level", 
+      value: String(battery), 
+      sent: false 
+  });
 }
 
 async function deviceUpdater(context: TagoContext): Promise<void> {
@@ -35,21 +29,18 @@ async function deviceUpdater(context: TagoContext): Promise<void> {
       tags: [{ key: "device_type", value: "sensor" }],
     },
   });
-  const resolveQueue = queue(resolveSensorQueue, 5);
+  const resolveQueue = queue(resolveDevice, 10);
 
   for await (const deviceList of sensorList) {
     for (const device of deviceList) {
-      const site_id = device.tags.find((tag) => tag.key === "site_id")?.value;
-      if (!site_id) {
-        throw "Sensor not assigned to a Site";
-      }
       const sensor_id = device.id;
-      const data = { context, sensor_id };
-      void resolveQueue.push(data);
+      void resolveQueue.push( { context, sensor_id });
     }
   }
 
-  await resolveQueue.drain();
+  if (resolveQueue.started) {
+    await resolveQueue.drain();
+  }
   context.log("Analysis Finished");
 }
 

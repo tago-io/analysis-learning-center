@@ -13,6 +13,20 @@ import { deleteUser } from "../services/user/remove";
 import { createVehicle } from "../services/vehicle/register";
 import { deleteVehicle } from "../services/vehicle/remove";
 
+async function getConfigDevice(): Promise<Device> {
+  const [config_dev_info] = await Resources.devices.list({
+    filter: { tags: [{ key: "device_type", value: "settings" }] },
+  });
+
+  const [config_dev_token] = await Resources.devices.tokenList(config_dev_info.id, { filter: { permission: "full" } });
+
+  if (!config_dev_token.token) {
+    throw "Did not receive Settings Device token, have you correctly created the Settings Device?";
+  }
+
+  return new Device({ token: config_dev_token.token });
+}
+
 async function analysisHandler(context: TagoContext, scope: Data[]): Promise<void> {
   console.log("SCOPE:", JSON.stringify(scope, null, 4));
   console.log("CONTEXT:", JSON.stringify(context, null, 4));
@@ -47,20 +61,6 @@ async function analysisHandler(context: TagoContext, scope: Data[]): Promise<voi
   const result = await router.exec();
 
   console.log("Services found:", result.services);
-}
-
-async function getConfigDevice(): Promise<Device> {
-  const [config_dev_info] = await Resources.devices.list({
-    filter: { tags: [{ key: "device_type", value: "settings" }] },
-  });
-
-  const [config_dev_token] = await Resources.devices.tokenList(config_dev_info.id, { filter: { permission: "full" } });
-
-  if (!config_dev_token.token) {
-    throw "Did not receive Settings Device token, have you correctly created the Settings Device?";
-  }
-
-  return new Device({ token: config_dev_token.token });
 }
 
 Analysis.use(analysisHandler, { token: process.env.T_ANALYSIS_TOKEN });
