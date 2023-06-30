@@ -5,7 +5,10 @@ import { DeviceListItem } from "@tago-io/sdk/lib/types";
 
 import { ServiceParams } from "../../types";
 
-async function deleteOrganization({ scope, context }: ServiceParams) {
+/**
+ * @Description Deletes the selected organization device along with all its related users and devices
+ */
+async function deleteOrganization({ scope }: ServiceParams) {
   const org_id = scope[0].device;
   if (!org_id) {
     return;
@@ -18,7 +21,6 @@ async function deleteOrganization({ scope, context }: ServiceParams) {
   if (user_accounts) {
     for (const user of user_accounts) {
       void Resources.run.userDelete(user.id as string);
-      console.log("Deleting user:", user.name);
     }
   }
 
@@ -29,6 +31,9 @@ async function deleteOrganization({ scope, context }: ServiceParams) {
     },
   });
 
+  /**
+   * @Description Deletes a device
+   */
   const deleteDevice = async (device: DeviceListItem) => await Resources.devices.delete(device.id);
   const deleteQueue = queue(deleteDevice, 5);
 

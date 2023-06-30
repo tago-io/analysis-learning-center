@@ -5,6 +5,9 @@ import { Data } from "@tago-io/sdk/src/common/common.types";
 import validation from "../../lib/validation";
 import { ServiceParams } from "../../types";
 
+/**
+ * @Description Gets sensor information from the scope
+ */
 async function getNewSensorVariables(scope: Data[]) {
   const new_sensor_name = scope.find((x) => x.variable === "new_sensor_name")?.value as string;
   const new_sensor_type = scope.find((x) => x.variable === "new_sensor_type")?.value as string;
@@ -14,6 +17,9 @@ async function getNewSensorVariables(scope: Data[]) {
   return { new_sensor_name, new_sensor_type, new_sensor_eui, new_sensor_site };
 }
 
+/**
+ * @Description Creates a new sensor device
+ */
 async function installDevice({ new_sensor_name, org_id, site_id, connector, new_device_eui }) {
   const device_data: DeviceCreateInfo = {
     name: new_sensor_name,
@@ -43,7 +49,10 @@ async function installDevice({ new_sensor_name, org_id, site_id, connector, new_
   return new_dev.device_id;
 }
 
-async function createSensor({ scope, context }: ServiceParams) {
+/**
+ * @Description Receives sensor data and creates a new sensor device
+ */
+async function createSensor({ scope }: ServiceParams) {
   const org_id = scope[0].device;
 
   const validate = await validation("sensor_validation", org_id);
@@ -51,7 +60,7 @@ async function createSensor({ scope, context }: ServiceParams) {
   const { new_sensor_name, new_sensor_type, new_sensor_eui, new_sensor_site } = await getNewSensorVariables(scope);
 
   if (new_sensor_name.length < 3) {
-    throw await validate("Device name must be at least 3 characters long", "danger");
+    return Promise.reject(await validate("Device name must be at least 3 characters long", "danger"));
   }
 
   const uc_new_sensor_eui = new_sensor_eui.toUpperCase();
@@ -60,7 +69,7 @@ async function createSensor({ scope, context }: ServiceParams) {
   const [dev_eui_exists] = await Resources.devices.list({ filter: { tags: [{ key: "device_eui", value: uc_new_sensor_eui }] } });
 
   if (dev_name_exists || dev_eui_exists) {
-    throw await validate("Sensor with same EUI or Name already exists", "danger");
+    return Promise.reject(await validate("Sensor with same EUI or Name already exists", "danger"));
   }
 
   const sensor_id = await installDevice({

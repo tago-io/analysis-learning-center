@@ -1,10 +1,14 @@
 import { queue } from "async";
 
 import { Resources } from "@tago-io/sdk";
+import { DeviceListItem } from "@tago-io/sdk/lib/types";
 
 import { ServiceParams } from "../../types";
 
-async function deleteSite({ scope, context }: ServiceParams) {
+/**
+ * @Description Deletes the selected site device along with all its related sensor and vehicle devices
+ */
+async function deleteSite({ scope }: ServiceParams) {
   const site_id = scope[0].device;
 
   const user_accounts = await Resources.run.listUsers({
@@ -24,9 +28,10 @@ async function deleteSite({ scope, context }: ServiceParams) {
     },
   });
 
-  async function deleteDevice(device: any) {
-    await Resources.devices.delete(device.id);
-  }
+  /**
+   * @Description Deletes a device
+   */
+  const deleteDevice = async (device: DeviceListItem) => await Resources.devices.delete(device.id);
 
   const deleteQueue = queue(deleteDevice, 5);
   deleteQueue.error((error: any) => console.log(error));
@@ -39,9 +44,9 @@ async function deleteSite({ scope, context }: ServiceParams) {
     }
   }
 
-  await deleteQueue.drain();
-  context.log("Analysis Finished");
-  return;
+  if (deleteQueue.started) {
+    await deleteQueue.drain();
+  }
 }
 
 export { deleteSite };

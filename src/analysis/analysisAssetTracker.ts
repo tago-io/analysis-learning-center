@@ -3,41 +3,38 @@ import { DeviceInfo } from "@tago-io/sdk/lib/types";
 import { Data } from "@tago-io/sdk/src/common/common.types";
 
 import { DataResolver } from "../lib/edit.data";
-import { TagoContext } from "../types";
 
 /**
- * This function will update the site map with the last location of the vehicle
+ * @Description Updates the site map with the last location of a vehicle
  */
-async function updateSiteMap(vehicle_info: DeviceInfo, site_id: string, outdoor_data: Data) {
+async function updateSiteMap(vehicle_info: DeviceInfo, outdoor_data: Data) {
   const vehicle_params = await Resources.devices.paramList(vehicle_info.id);
   const vehicle_img = vehicle_params.find((x) => x.key === "image_urllink")?.value as string;
 
   const dataResolver = DataResolver(vehicle_info.id);
-  dataResolver.setVariable(
-    {
-      variable: "vehicle_sensor_location",
-      value: vehicle_info.name,
-      location: outdoor_data?.location,
-      group: vehicle_info.id,
-      metadata: {
-        img_pin: vehicle_img,
-      },
+  dataResolver.setVariable({
+    variable: "vehicle_sensor_location",
+    value: vehicle_info.name,
+    location: outdoor_data?.location,
+    group: vehicle_info.id,
+    metadata: {
+      img_pin: vehicle_img,
     },
-  );
-  await dataResolver.apply([vehicle_info.id]);
+  });
+  await dataResolver.apply(vehicle_info.id);
 }
 
 /**
- * This function will update the history table of the vehicle
+ * @Description Updates the Site's Vehicle history table
  */
 async function updateHistoryData(vehicle_info: DeviceInfo, outdoor_data: Data, site_id: string) {
   const sensor_history = {
     variable: "sensor_history",
     group: vehicle_info.id,
     value: vehicle_info.name,
-      location: outdoor_data?.location,
-      metadata: {
-        vehicleurl: vehicle_info,
+    location: outdoor_data?.location,
+    metadata: {
+      vehicleurl: vehicle_info,
     },
   };
 
@@ -46,9 +43,9 @@ async function updateHistoryData(vehicle_info: DeviceInfo, outdoor_data: Data, s
 }
 
 /**
- * Analysis Starts Here
+ * @Description Updates the Site's Vehicle history table and map with the last location of a vehicle
  */
-async function assetTracker(context: TagoContext, scope: Data[]) {
+async function assetTracker(scope: Data[]) {
   console.log("Running Analysis");
 
   const device_id = scope[0].device;
@@ -71,10 +68,8 @@ async function assetTracker(context: TagoContext, scope: Data[]) {
 
   const vehicle_info = await Resources.devices.info(vehicle_id);
 
-  await updateSiteMap(vehicle_info, site_id, outdoor_data);
+  await updateSiteMap(vehicle_info, outdoor_data);
   await updateHistoryData(vehicle_info, outdoor_data, site_id);
-
-  context.log("Analysis Finished");
 }
 
 Analysis.use(assetTracker, { token: process.env.T_ANALYSIS_TOKEN });

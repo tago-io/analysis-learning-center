@@ -5,6 +5,9 @@ import { Data } from "@tago-io/sdk/src/common/common.types";
 import validation from "../../lib/validation";
 import { ServiceParams } from "../../types";
 
+/**
+ * @Description Gets site information from the scope
+ */
 async function getNewSiteVariables(scope: Data[]) {
   const name = scope.find((x) => x.variable === "new_site_name")?.value as string;
   const address = scope.find((x) => x.variable === "new_site_address") as Data;
@@ -12,6 +15,9 @@ async function getNewSiteVariables(scope: Data[]) {
   return { name, address };
 }
 
+/**
+ * @Description Creates a new site device
+ */
 async function installDevice({ site_name, org_id }) {
   const device_data: DeviceCreateInfo = {
     name: site_name,
@@ -33,7 +39,10 @@ async function installDevice({ site_name, org_id }) {
   return new_site.device_id;
 }
 
-async function createSite({ scope, context }: ServiceParams) {
+/**
+ * @Description Receives site data and creates a new site device
+ */
+async function createSite({ scope }: ServiceParams) {
   const org_id = scope[0].device;
   const validate = await validation("site_validation", org_id);
   await validate("Registering...", "warning");
@@ -42,11 +51,11 @@ async function createSite({ scope, context }: ServiceParams) {
   const [site_exists] = await Resources.devices.list({ filter: { name: new_site_name } });
 
   if (site_exists) {
-    throw await validate("Site name already exists", "danger");
+    return Promise.reject(await validate("Site name already exists", "danger"));
   }
 
   if (new_site_name.length < 3) {
-    throw await validate("Site name must be at least 3 characters long", "danger");
+    return Promise.reject(await validate("Site name must be at least 3 characters long", "danger"));
   }
 
   const site_id = await installDevice({
@@ -69,7 +78,6 @@ async function createSite({ scope, context }: ServiceParams) {
     },
   ]);
 
-  context.log("Analysis Finished");
   return await validate("Site successfully created!", "success");
 }
 

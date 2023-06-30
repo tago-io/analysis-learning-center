@@ -2,7 +2,10 @@ import { Resources } from "@tago-io/sdk";
 
 import { ServiceParams } from "../../types";
 
-async function deleteSensor({ scope, context }: ServiceParams) {
+/**
+ * @Description Deletes the selected sensor device along with its vehicle if it has one
+ */
+async function deleteSensor({ scope }: ServiceParams) {
   const dev_id = scope[0].device;
   const device_info = await Resources.devices.info(dev_id);
   const vehicle_id = device_info.tags.find((tag) => tag.key === "vehicle_id")?.value;
@@ -12,6 +15,5 @@ async function deleteSensor({ scope, context }: ServiceParams) {
   if (vehicle_id) {
     await Resources.devices.delete(vehicle_id);
   }
-  context.log("Analysis Finished");
 }
 export { deleteSensor };

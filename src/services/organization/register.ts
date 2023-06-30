@@ -5,6 +5,9 @@ import { Data } from "@tago-io/sdk/src/common/common.types";
 import validation from "../../lib/validation";
 import { ServiceParams } from "../../types";
 
+/**
+ * @Description Gets organization information from the scope
+ */
 function getNewOrgVariables(scope: Data[]) {
   const name = scope.find((x) => x.variable === "new_org_name")?.value as string;
   const address = scope.find((x) => x.variable === "new_org_address") as Data;
@@ -12,6 +15,9 @@ function getNewOrgVariables(scope: Data[]) {
   return { name, address };
 }
 
+/**
+ * @Description Creates a new organization device
+ */
 async function installDevice({ new_org_name }) {
   const device_data: DeviceCreateInfo = {
     name: new_org_name,
@@ -32,7 +38,10 @@ async function installDevice({ new_org_name }) {
   return new_org.device_id;
 }
 
-async function createOrganization({ scope, config_dev, context }: ServiceParams) {
+/**
+ * @Description Receives organization data and creates a new organization device
+ */
+async function createOrganization({ scope, config_dev }: ServiceParams) {
   const { id: config_dev_id } = await config_dev.info();
 
   const validate = await validation("org_validation", config_dev_id);
@@ -47,7 +56,7 @@ async function createOrganization({ scope, config_dev, context }: ServiceParams)
   }
 
   if ((new_org_name as string)?.length < 3) {
-    throw await validate("Organization name must be at least 3 characters long", "danger");
+    return Promise.reject(await validate("Organization name must be at least 3 characters long", "danger"));
   }
 
   const device_id = await installDevice({
@@ -69,7 +78,6 @@ async function createOrganization({ scope, config_dev, context }: ServiceParams)
     },
   ]);
 
-  context.log("Analysis Finished");
   return await validate("Organization created", "success");
 }
 

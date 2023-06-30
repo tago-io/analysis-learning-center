@@ -5,6 +5,9 @@ import { Data } from "@tago-io/sdk/src/common/common.types";
 import validation from "../../lib/validation";
 import { ServiceParams } from "../../types";
 
+/**
+ * @Description Gets sensor information from the scope
+ */
 async function getNewVehicleVariables(scope: Data[]) {
   const new_vehicle_name = scope.find((x) => x.variable === "new_vehicle_name");
   const new_vehicle_serie = scope.find((x) => x.variable === "new_vehicle_serie");
@@ -19,6 +22,9 @@ async function getNewVehicleVariables(scope: Data[]) {
   };
 }
 
+/**
+ * @Description Creates a new vehicle device
+ */
 async function installDevice({ new_dev_name, org_id, site_id, sensor_id, vehicle_serie }) {
   const device_data: DeviceCreateInfo = {
     name: new_dev_name,
@@ -43,7 +49,10 @@ async function installDevice({ new_dev_name, org_id, site_id, sensor_id, vehicle
   return new_dev.device_id;
 }
 
-async function createVehicle({ scope, context }: ServiceParams) {
+/**
+ * @Description Receives vehicle data and creates a new vehicle device
+ */
+async function createVehicle({ scope }: ServiceParams) {
   const org_id = scope[0].device;
   const validate = await validation("vehicle_validation", org_id);
   await validate("Registering...", "warning");
@@ -57,7 +66,7 @@ async function createVehicle({ scope, context }: ServiceParams) {
   const site_id = site_info.tags.find((x) => x.key === "site_id")?.value;
 
   if (!site_id) {
-    throw "Site id not found!";
+    return Promise.reject(await validate("Site id not found!", "danger"));
   }
 
   const vehicle_id = await installDevice({
@@ -77,7 +86,6 @@ async function createVehicle({ scope, context }: ServiceParams) {
 
   await Resources.devices.edit(sensor_id, { tags: sensor_tags });
   await Resources.devices.paramSet(vehicle_id, { key: "image_urllink", value: image });
-  context.log("Analysis Finished");
   return validate("Vehicle created successfully!", "success");
 }
 

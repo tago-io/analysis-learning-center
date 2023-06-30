@@ -2,7 +2,10 @@ import { Resources } from "@tago-io/sdk";
 
 import { ServiceParams } from "../../types";
 
-async function deleteUser({ scope, environment, context }: ServiceParams) {
+/**
+ * @Description Deletes the selected user
+ */
+async function deleteUser({ scope, environment }: ServiceParams) {
   // @ts-ignore
   const user_id = scope[0].user;
   // checking if user exists
@@ -23,7 +26,6 @@ async function deleteUser({ scope, environment, context }: ServiceParams) {
   }
 
   await Resources.run.userDelete(user_id);
-  context.log("Analysis Finished");
   return;
 }
 

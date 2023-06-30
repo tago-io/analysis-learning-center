@@ -5,6 +5,9 @@ import { inviteUser } from "../../lib/registerUser";
 import validation from "../../lib/validation";
 import { ServiceParams } from "../../types";
 
+/**
+ * @Description Gets user information from the scope
+ */
 async function getNewUserVariables(scope: Data[]) {
   const new_user_name = scope.find((x) => x.variable === "new_user_name");
   const new_user_email = scope.find((x) => x.variable === "new_user_email");
@@ -15,6 +18,9 @@ async function getNewUserVariables(scope: Data[]) {
   return { new_user_name, new_user_email, new_user_phone, new_user_access, new_user_site } as any;
 }
 
+/**
+ * @Description Receives user data, creates a new user and sends an invitation email
+ */
 async function createUser({ context, scope }: ServiceParams) {
   const org_id = scope[0].device;
   const validate = await validation("user_validation", org_id);
@@ -61,7 +67,6 @@ async function createUser({ context, scope }: ServiceParams) {
   };
 
   await inviteUser(context, new_user_data, "rtls.tago.run/");
-  context.log("Analysis Finished");
   return await validate("User successfully invited! An email will be sent with the credentials to the new user.", "success");
 }
 
