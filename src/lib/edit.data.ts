@@ -10,7 +10,7 @@ import { DataToSend } from "@tago-io/sdk/src/types";
  * editData.setVariable({ variable: "data-to-update", value: 1 });
  * await editData.apply();
  *
- * @param {Device} device your device instanced class
+ * @param {String} device_id your device id string
  * @param debug
  * @returns
  */
@@ -47,7 +47,7 @@ function DataResolver(device_id: string, debug: boolean = false) {
      */
     apply: async function (groups?: string | string[]) {
       if (oldDataList.length === 0) {
-        oldDataList = await Resources.devices.getDeviceData(device_id, { variables, qty: 99, groups });
+        oldDataList = await Resources.devices.getDeviceData(device_id, { variables, groups });
       }
 
       const toUpdate: DataToEdit[] = [];
@@ -73,6 +73,7 @@ function DataResolver(device_id: string, debug: boolean = false) {
       if (toAdd.length > 0) {
         await Resources.devices.sendDeviceData(device_id, toAdd);
       }
+
       return { toAdd, toUpdate };
     },
     /**

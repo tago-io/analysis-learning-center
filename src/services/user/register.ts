@@ -33,7 +33,7 @@ async function createUser({ context, scope }: ServiceParams) {
     filter: { email: new_user_email.value },
   });
   if (user_exists) {
-    return await validate("User already exists!", "danger");
+    return Promise.reject(await validate("User already exists!", "danger"));
   }
 
   const new_user_data = {

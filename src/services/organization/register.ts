@@ -9,8 +9,8 @@ import { ServiceParams } from "../../types";
  * @Description Gets organization information from the scope
  */
 function getNewOrgVariables(scope: Data[]) {
-  const name = scope.find((x) => x.variable === "new_org_name")?.value as string;
-  const address = scope.find((x) => x.variable === "new_org_address") as Data;
+  const name = scope.find((x) => x.variable === "new_organization_name")?.value as string;
+  const address = scope.find((x) => x.variable === "new_organization_address") as Data;
 
   return { name, address };
 }
@@ -44,7 +44,7 @@ async function installDevice({ new_org_name }) {
 async function createOrganization({ scope, config_dev }: ServiceParams) {
   const { id: config_dev_id } = await config_dev.info();
 
-  const validate = await validation("org_validation", config_dev_id);
+  const validate = await validation("organization_validation", config_dev_id);
   await validate("Registering...", "warning");
 
   const { name: new_org_name, address: new_org_address } = await getNewOrgVariables(scope);

@@ -10,8 +10,8 @@ import { ServiceParams } from "../../types";
  */
 async function getNewVehicleVariables(scope: Data[]) {
   const new_vehicle_name = scope.find((x) => x.variable === "new_vehicle_name");
-  const new_vehicle_serie = scope.find((x) => x.variable === "new_vehicle_serie");
-  const new_vehicle_img = scope.find((x) => x.variable === "new_vehicle_img");
+  const new_vehicle_serie = scope.find((x) => x.variable === "new_vehicle_serial");
+  const new_vehicle_img = scope.find((x) => x.variable === "new_vehicle_image");
   const new_vehicle_sensor = scope.find((x) => x.variable === "new_vehicle_sensor");
 
   return {

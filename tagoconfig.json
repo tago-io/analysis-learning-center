@@ -4,23 +4,23 @@
     "dev": {
         "analysisList": [
             {
-                "fileName": "analysisAssetTracker.ts",
+                "fileName": "analysisAssetTracking.ts",
                 "name": "Asset Tracking",
-                "id": "647743c587d3230008a1112f"
+                "id": "646cc0c45ca70a000fa5102b"
             },
             {
                 "fileName": "analysisDeviceUpdater.ts",
                 "name": "Device Updater",
-                "id": "647743badddc3900093dfa44"
+                "id": "646cc0d037042f0009867c1f"
             },
             {
                 "fileName": "analysisHandler.ts",
                 "name": "Handler",
-                "id": "64774162a90c38000860189a"
+                "id": "646cc0b7deae760009957658"
             }
         ],
-        "id": "6363be9028a9990018c8db1e",
-        "profileName": "Fleet Management Not in video",
+        "id": "6462669c04f7ad00097e24df",
+        "profileName": "Fleet Management",
         "email": "freddy.minuzzi@tago.io"
     }
 }
