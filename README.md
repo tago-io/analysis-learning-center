@@ -13,10 +13,3 @@ Features
 - Easy modification: Easily modify this application to your specific needs!
 Getting Started
 
-To get started with the Fleet Management Application, clone this repository and follow the installation instructions in the INSTALL.md file.
-git
-
-We welcome contributions to the Fleet Management Application. Please see the CONTRIBUTING.md file for more information on how to contribute.
-License
-
-This project is licensed under the MIT License. See the LICENSE.md file for details.
